@@ -3,18 +3,16 @@ import maya.cmds as cmds
 import maya.OpenMayaUI as omui
 from shiboken2 import wrapInstance
 
-class PlaybackSpeedUI(QtWidgets.QDockWidget):
+class PlaybackSpeedUI(QtWidgets.QWidget):
     def __init__(self):
         super(PlaybackSpeedUI, self).__init__()
         self.setWindowTitle("Playback Speed Control")
-        self.setAllowedAreas(QtCore.Qt.AllDockWidgetAreas)
-        self.setFeatures(QtWidgets.QDockWidget.DockWidgetFloatable | QtWidgets.QDockWidget.DockWidgetMovable)
+        self.resize(250, 150)
         
         self.init_ui()
 
     def init_ui(self):
-        widget = QtWidgets.QWidget()
-        layout = QtWidgets.QVBoxLayout(widget)
+        layout = QtWidgets.QVBoxLayout(self)
 
         # Speed presets
         self.presets_combo = QtWidgets.QComboBox()
@@ -38,8 +36,6 @@ class PlaybackSpeedUI(QtWidgets.QDockWidget):
         layout.addWidget(self.custom_speed_edit)
         layout.addWidget(self.speed_label)
         layout.addWidget(self.close_button)
-
-        self.setWidget(widget)
 
     def update_speed(self, index):
         speed_text = self.presets_combo.currentText()
@@ -78,7 +74,7 @@ def show_ui():
     except:
         pass
     playback_speed_ui = PlaybackSpeedUI()
-    maya_main_window().addDockWidget(QtCore.Qt.RightDockWidgetArea, playback_speed_ui)
+    playback_speed_ui.show()
 
 # Show the UI
 show_ui()
