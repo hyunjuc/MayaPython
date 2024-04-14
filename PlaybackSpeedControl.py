@@ -1,0 +1,84 @@
+from PySide2 import QtWidgets, QtCore
+import maya.cmds as cmds
+import maya.OpenMayaUI as omui
+from shiboken2 import wrapInstance
+
+class PlaybackSpeedUI(QtWidgets.QDockWidget):
+    def __init__(self):
+        super(PlaybackSpeedUI, self).__init__()
+        self.setWindowTitle("Playback Speed Control")
+        self.setAllowedAreas(QtCore.Qt.AllDockWidgetAreas)
+        self.setFeatures(QtWidgets.QDockWidget.DockWidgetFloatable | QtWidgets.QDockWidget.DockWidgetMovable)
+        
+        self.init_ui()
+
+    def init_ui(self):
+        widget = QtWidgets.QWidget()
+        layout = QtWidgets.QVBoxLayout(widget)
+
+        # Speed presets
+        self.presets_combo = QtWidgets.QComboBox()
+        self.presets_combo.addItems(["0.10x", "0.20x", "0.25x", "0.33x", "0.50x", "1.0x", "2.0x", "3.0x", "4.0x", "5.0x", "10.0x", "Custom"])
+        self.presets_combo.currentIndexChanged.connect(self.update_speed)
+
+        # Custom speed input
+        self.custom_speed_edit = QtWidgets.QLineEdit()
+        self.custom_speed_edit.setPlaceholderText("Custom Speed")
+        self.custom_speed_edit.setEnabled(False)
+        self.custom_speed_edit.returnPressed.connect(self.set_custom_speed)
+
+        # Playback speed label
+        self.speed_label = QtWidgets.QLabel("Playback Speed: 1.0x")
+
+        # Close button
+        self.close_button = QtWidgets.QPushButton("Close")
+        self.close_button.clicked.connect(self.close_window)
+
+        layout.addWidget(self.presets_combo)
+        layout.addWidget(self.custom_speed_edit)
+        layout.addWidget(self.speed_label)
+        layout.addWidget(self.close_button)
+
+        self.setWidget(widget)
+
+    def update_speed(self, index):
+        speed_text = self.presets_combo.currentText()
+        if speed_text == "Custom":
+            self.custom_speed_edit.setEnabled(True)
+            self.custom_speed_edit.setFocus()
+        else:
+            self.custom_speed_edit.setEnabled(False)
+            speed = float(speed_text.replace("x", ""))
+            self.set_speed(speed)
+
+    def set_speed(self, speed):
+        cmds.playbackOptions(playbackSpeed=speed)
+        self.speed_label.setText("Playback Speed: {}x".format(speed))
+
+    def set_custom_speed(self):
+        custom_speed_text = self.custom_speed_edit.text()
+        try:
+            custom_speed = float(custom_speed_text)
+            self.set_speed(custom_speed)
+        except ValueError:
+            pass
+
+    def close_window(self):
+        self.close()
+
+def maya_main_window():
+    main_window_ptr = omui.MQtUtil.mainWindow()
+    return wrapInstance(int(main_window_ptr), QtWidgets.QMainWindow)
+
+def show_ui():
+    global playback_speed_ui
+    try:
+        playback_speed_ui.close()
+        playback_speed_ui.deleteLater()
+    except:
+        pass
+    playback_speed_ui = PlaybackSpeedUI()
+    maya_main_window().addDockWidget(QtCore.Qt.RightDockWidgetArea, playback_speed_ui)
+
+# Show the UI
+show_ui()
