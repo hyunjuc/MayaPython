@@ -7,8 +7,12 @@ class PlaybackSpeedUI(QtWidgets.QWidget):
     def __init__(self):
         super(PlaybackSpeedUI, self).__init__()
         self.setWindowTitle("Playback Speed Control")
+        self.setObjectName("PlaybackSpeedUI")  # Set an object name for the UI
         self.resize(250, 150)
-        
+
+        # Set the window flags to make the window stay on top
+        self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
+
         self.init_ui()
 
     def init_ui(self):
@@ -75,6 +79,9 @@ def show_ui():
         pass
     playback_speed_ui = PlaybackSpeedUI()
     playback_speed_ui.show()
+
+    # Use scriptJob to keep the window in focus
+    cmds.scriptJob(uiDeleted=[playback_speed_ui.objectName(), lambda: show_ui()], parent=playback_speed_ui.objectName())
 
 # Show the UI
 show_ui()
