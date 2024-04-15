@@ -81,7 +81,7 @@ def show_ui():
     playback_speed_ui.show()
 
     # Use scriptJob to keep the window in focus
-    cmds.scriptJob(uiDeleted=[playback_speed_ui.objectName(), lambda: show_ui()], parent=playback_speed_ui.objectName())
+    cmds.scriptJob(uiDeleted=[playback_speed_ui.objectName()], parent=playback_speed_ui.objectName(), protected=True, runOnce=True, event=[playback_speed_ui.objectName(), lambda *args: show_ui()])
 
 # Show the UI
 show_ui()
